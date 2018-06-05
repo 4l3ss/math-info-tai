@@ -35,6 +35,8 @@ int main()
     cout << "Fichier choisi : " << filename << endl;
     AF automate(filename);
     automate.afficherInfos();
-    automate.est_asynchrone();
+    automate.est_un_automate_asynchrone();
+    automate.est_un_automate_deterministe();
+    automate.est_un_automate_complet();
     return 0;
 }

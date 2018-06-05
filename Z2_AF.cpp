@@ -71,7 +71,7 @@ void AF::afficherInfos(){
 
 }
 
-bool AF::est_asynchrone(){
+bool AF::est_un_automate_asynchrone(){
     std::cout << "\n Test asynchrone : \n";
     bool resultat = false;
     for (std::vector<Transition>::const_iterator i = transitions.begin(); i != transitions.end(); ++i){
@@ -82,7 +82,7 @@ bool AF::est_asynchrone(){
 
     }
 
-    std::cout << "L'automate fini est " << (resultat ? "Asynchrone" : "Synchrone") << "\n";
+    std::cout << "L'automate fini est " << (resultat ? "Asynchrone" : "Synchrone") << "\n\n";
     return resultat;
 }
 
@@ -90,10 +90,15 @@ bool AF::est_asynchrone(){
  * Retourne un tableau qui associe à chaque symbole le nombre de transition partant de l'etat donné
  * 0=a,1=b,2=c ...etc
  **/
-int[] AF::compter_transition_partant_d_etat_par_symbole(int etat){
-    int compte[] = new int[nbSymboles];
+int* AF::compter_transition_partant_d_etat_par_symbole(int etat){
+    int *compte;
+    compte = new int[nbSymboles];
+    int j;
+    for(j=0;j<nbSymboles;j++){
+        compte[j] = 0;
+    }
     for (std::vector<Transition>::const_iterator i = transitions.begin(); i != transitions.end(); ++i){
-        if((*i).etatDepart == etat){
+        if((*i).etatDepart == etat && (*i).symbole != '*'){
             compte[(*i).symbole-'a']++;
         }
     }
@@ -101,18 +106,41 @@ int[] AF::compter_transition_partant_d_etat_par_symbole(int etat){
     return compte;
 }
 
-bool AF::est_deterministe(){
+bool AF::est_un_automate_deterministe(){
     bool resultat = true;
     if(nbEtatsInitiaux>1){
-        std::cout << "L'automate a " << nbEtatsInitiaux << "\n";
+        std::cout << " * L'automate a " << nbEtatsInitiaux << " etats initiaux\n";
         resultat = false;
     }
     int i,j;
     for(i=0; i<nbEtats;i++){
-        int comptes[] = compter_transition_partant_d_etat_par_symbole(i);
+        int *comptes = compter_transition_partant_d_etat_par_symbole(i);
         for(j=0; j<nbSymboles;j++){
-
+            if(comptes[j] > 1){
+                std::cout << " * L'etat " << i << " comporte " << comptes[j] << " transitions sortantes \"" << (char)('a'+j) << "\"\n";
+                resultat = false;
+            }
         }
     }
+    std::cout << "L'automate fini est " << (resultat ? "deterministe" : "non-deterministe") << "\n";
+    return resultat;
+
+}
+
+bool AF::est_un_automate_complet(){
+    bool resultat = true;
+
+    int i,j;
+    for(i=0; i<nbEtats;i++){
+        int *comptes = compter_transition_partant_d_etat_par_symbole(i);
+        for(j=0; j<nbSymboles;j++){
+            if(comptes[j] == 0){
+                std::cout << " * L'etat " << i << " n'a pas de transition sortante \"" << (char)('a'+j) << "\"\n";
+                resultat = false;
+            }
+        }
+    }
+    std::cout << "L'automate fini est " << (resultat ? "complet" : "pas complet") << "\n";
+    return resultat;
 
 }

@@ -27,9 +27,11 @@ class AF
         std::vector<Transition> transitions;
 
         AF(std::string);
-        bool est_asynchrone();
-        bool est_deterministe();
+        bool est_un_automate_asynchrone();
+        bool est_un_automate_deterministe();
+        bool est_un_automate_complet();
         void afficherInfos();
+        int* compter_transition_partant_d_etat_par_symbole(int);
 };
 
 #endif // AF_H
