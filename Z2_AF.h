@@ -27,7 +27,8 @@ class AF
         std::vector<Transition> transitions;
 
         AF(std::string);
-        void ajouterTransition();
+        bool est_asynchrone();
+        bool est_deterministe();
         void afficherInfos();
 };
 

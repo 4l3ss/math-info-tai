@@ -32,8 +32,9 @@ string askFilename(){
 int main()
 {
     string filename = askFilename();
-    cout << "Fichier choisie : " << filename << endl;
+    cout << "Fichier choisi : " << filename << endl;
     AF automate(filename);
     automate.afficherInfos();
+    automate.est_asynchrone();
     return 0;
 }
