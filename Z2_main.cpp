@@ -38,5 +38,6 @@ int main()
     automate.est_un_automate_asynchrone();
     automate.est_un_automate_deterministe();
     automate.est_un_automate_complet();
+    automate.completion();
     return 0;
 }

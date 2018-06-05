@@ -33,14 +33,6 @@ AF::AF(std::string filename)
 
         transitions.push_back(transition);
     }
-
-/*    int
-    while(infile >> ){
-        std::string line;
-        filestream. >> line;
-        std::cout << line;
-    }*/
-    //std::cout << filestream. << std::endl;
 }
 
 void AF::afficherInfos(){
@@ -143,4 +135,25 @@ bool AF::est_un_automate_complet(){
     std::cout << "L'automate fini est " << (resultat ? "complet" : "pas complet") << "\n";
     return resultat;
 
+}
+
+void AF::completion(){
+    int i,j;
+    for(i=0; i<nbEtats;i++){
+        int *comptes = compter_transition_partant_d_etat_par_symbole(i);
+        for(j=0; j<nbSymboles;j++){
+            if(comptes[j] == 0){
+                std::cout << " * L'etat " << i << " n'a pas de transition sortante \"" << (char)(j+'a') << "\"\n";
+                std::cout << "   -> Ajout d'une transition vers l'etat poubelle " << i << (char)(j+'a') << "p\n";
+
+                Transition transition;
+                transition.etatDepart = i;
+                transition.symbole = j+'a';
+                transition.etatArrivee = -1;
+                transitions.push_back(transition);
+            }
+        }
+    }
+
+    est_un_automate_complet();
 }

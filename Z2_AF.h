@@ -32,6 +32,7 @@ class AF
         bool est_un_automate_complet();
         void afficherInfos();
         int* compter_transition_partant_d_etat_par_symbole(int);
+        void completion();
 };
 
 #endif // AF_H
