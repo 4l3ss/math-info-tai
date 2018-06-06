@@ -35,33 +35,42 @@ int main()
     while(true){
         string filename = askFilename();
         cout << "Fichier choisi : " << filename << endl;
-        AF automate(filename);
+        AF automate;
+        automate.charger_fichier(filename);
         automate.afficherInfos();
-        bool testable = false;
-            testable = true;
+
+        bool est_complet = false;
+
         if(!automate.est_un_automate_asynchrone()){
             if(automate.est_un_automate_deterministe()){
                 if(!automate.est_un_automate_complet()){
                     automate.completion();
                 }
+                est_complet = true;
             }
         }
         automate.afficherInfos();
         char choice;
         do{
             cout << "\n 1) Changer d'automate\n";
-            if(testable){
-                cout << " 2) Tester des mots sur cet automate\n";
+            cout << " 2) Tester des mots sur cet automate\n";
+            if(est_complet){
+                cout << " 3) Passer a l'automate complementaire\n";
             }
+            cout << "\n 0) Quitter\n";
+
             cout << "choix > ";
             cin >> choice;
 
             switch(choice){
-                case '2':
-                    if(testable){
-                        automate.lire_mot();
+                case '2': automate.lire_mot();
+                case '3':
+                    if(est_complet){
+                        automate = automate.automate_complementaire();
+                        automate.afficherInfos();
                     }
                 break;
+                case '0' : return 0;
             }
 
         }

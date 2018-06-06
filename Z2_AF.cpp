@@ -17,8 +17,7 @@ Transition creer_transition(std::string str_transition){
     return transition;
 }
 
-AF::AF(std::string filename)
-{
+void AF::charger_fichier(std::string filename){
     std::ifstream infile(filename.c_str());
 
     infile>>nbSymboles>>nbEtats>>nbEtatsInitiaux;
@@ -41,14 +40,11 @@ AF::AF(std::string filename)
         std::string str_transition;
         infile >> str_transition;
         Transition transition = creer_transition(str_transition);
-
-        /*transition.etatDepart = str_transition[0]-'0';
-        transition.symbole = str_transition[1];
-        transition.etatArrivee = str_transition[2]-'0';*/
-
         transitions.push_back(transition);
     }
 }
+
+AF::AF(){}
 
 void AF::afficherInfos(){
     std::cout
@@ -65,9 +61,11 @@ void AF::afficherInfos(){
         std::cout << *i << " ";
     }
 
+
     std::cout << "\nListe des etats terminaux : ";
     for (std::vector<int>::const_iterator i = etatsTerminaux.begin(); i != etatsTerminaux.end(); ++i){
-        std::cout << *i << " ";
+        if(*i == -1){std::cout << "p ";}
+        else{std::cout << *i << " ";}
     }
 
     if(nbTransitions>0){
@@ -255,38 +253,44 @@ bool AF::mot_est_valide(const char* mot, int etatActuel, bool debut){
         return false; //Aucune transition depuis l'etat actuel ne conduit à une reconnaissance du mot
     }
 }
+
 void AF::reconnaitre_mot(std::string mot){
     if(this->mot_est_valide(mot.c_str(), 0, true)){
         std::cout << "Le mot est reconnu\n";
     }else{
         std::cout << "Le mot n'est pas reconnu\n";
     }
-   /* int etat = etatsInitiaux.front();
-    int position_mot = 0;
-    std::cout << etat;
-    std::cout << "\n->("<<etat<<")-";
-    while(mot[position_mot] != 0){
-        if(mot[position_mot]<'a' || mot[position_mot]>'a'+nbSymboles){
-            std::cout<< "Le symbole " << mot[position_mot] << " ne fait pas parti de l'alphabet\n";
-            return;
+}
+
+bool AF::possede_etat_poubelle(){
+    for (std::vector<Transition>::iterator i = transitions.begin(); i != transitions.end(); ++i){
+        if((*i).etatArrivee == -1){
+            return true;
         }
-        Transition* chemin = rechercher_transition(etat, mot[position_mot]);
-        if(chemin != 0){
-            etat = chemin->etatArrivee;
-        }else{
-            break;
-        }
-        std::cout << mot[position_mot] << "->("<<(char)(etat == -1 ? 'p':(etat+'0'))<<")-";
-        position_mot++;
     }
+    return false;
+}
 
-    if(mot[position_mot] != 0){
-        std::cout << "\nLe mot n'est pas reconnu : Le mot n'est pas fini mais aucune transition n'accepte le symbole suivant\n";
-    }else if(std::find(etatsTerminaux.begin(), etatsTerminaux.end(), etat) == etatsTerminaux.end()){
-        std::cout << " \nLe mot n'est pas reconnu : l'etat " << (char)(etat == -1 ? 'p':(etat+'0')) << " n'est pas terminal\n";
-    }else{
-        //on est a un etat terminal
-        std::cout << "\nLe mot est reconnu\n";
-    }*/
+AF AF::automate_complementaire(){
+    AF automate;
+    for(int i = -1; i<nbEtats;i++){
 
+
+        if(etat_est_terminal(i) == false){
+            if(i==-1 && possede_etat_poubelle()){ //etat poubelle
+                automate.etatsTerminaux.push_back(i);
+            }else if(i!=-1){
+                automate.etatsTerminaux.push_back(i);
+            }
+        }
+    }
+    automate.nbSymboles = nbSymboles;
+    automate.etatsInitiaux.push_back(etatsInitiaux[0]);
+    automate.nbEtats = nbEtats;
+    automate.nbTransitions = nbTransitions;
+    automate.nbEtatsInitiaux = nbEtatsInitiaux;
+    automate.nbEtatsTerminaux = automate.etatsTerminaux.size();
+    automate.transitions = std::vector<Transition>(transitions);
+
+    return automate;
 }
