@@ -4,6 +4,14 @@
 #include <algorithm>
 #include <sstream>
 
+void afficher_symboles(int n){
+    std::cout << "(";
+    for(int i = 0; i<n; i++){
+        std::cout<<(char)(i+'a');
+    }
+    std::cout << ")";
+}
+
 Transition creer_transition(std::string str_transition){
     Transition transition;
     int depart, arrivee;
@@ -48,8 +56,14 @@ AF::AF(){}
 
 void AF::afficherInfos(){
     std::cout
-    << "\nNombre de symboles       : " << nbSymboles
-    << "\nNombre d'etats           : " << nbEtats
+    << "\nNombre de symboles       : " << nbSymboles;
+    if(nbSymboles >0){afficher_symboles(nbSymboles);}
+    std::cout
+    << "\nNombre d'etats           : " << nbEtats;
+    if(possede_etat_poubelle()){
+        std::cout << " + poubelle";
+    }
+    std::cout
     << "\nNombre d'etats initiaux  : " << nbEtatsInitiaux
     << "\nNombre d'etats terminaux : " << nbEtatsTerminaux
     << "\nNombre de transitions    : " << nbTransitions
@@ -60,14 +74,20 @@ void AF::afficherInfos(){
     for (std::vector<int>::const_iterator i = etatsInitiaux.begin(); i != etatsInitiaux.end(); ++i){
         std::cout << *i << " ";
     }
-
+    if(etatsTerminaux.size() == 0){
+        std::cout << "aucun etat initial\n";
+    }
 
     std::cout << "\nListe des etats terminaux : ";
     for (std::vector<int>::const_iterator i = etatsTerminaux.begin(); i != etatsTerminaux.end(); ++i){
         if(*i == -1){std::cout << "p ";}
         else{std::cout << *i << " ";}
     }
-
+    if(etatsTerminaux.size() == 0){
+        std::cout << "aucun etat terminal\n";
+    }else{
+        std::cout << "\n";
+    }
     if(nbTransitions>0){
         std::cout << "\nListe des transitions : \n";
         for (std::vector<Transition>::const_iterator i = transitions.begin(); i != transitions.end(); ++i){
