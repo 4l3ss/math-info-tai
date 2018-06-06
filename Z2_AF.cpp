@@ -177,7 +177,7 @@ void AF::completion(){
 
                 nbTransitions++;
                 if(ajouter_poubelle){
-                    nbEtats++;
+                    //nbEtats++;
                     ajouter_poubelle = false;
                 }
             }

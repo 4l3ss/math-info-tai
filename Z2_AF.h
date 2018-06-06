@@ -12,8 +12,16 @@ typedef struct Transition{
 class AF
 {
 
-
     public:
+        AF(std::string);
+        bool est_un_automate_asynchrone();
+        bool est_un_automate_deterministe();
+        bool est_un_automate_complet();
+        void afficherInfos();
+        void completion();
+        void lire_mot();
+        void reconnaitre_mot(std::string);
+    private:
         int nbSymboles;
         int nbEtats;
 
@@ -26,17 +34,9 @@ class AF
         int nbTransitions;
         std::vector<Transition> transitions;
 
-        AF(std::string);
-        bool est_un_automate_asynchrone();
-        bool est_un_automate_deterministe();
-        bool est_un_automate_complet();
-        void afficherInfos();
-        int* compter_transition_partant_d_etat_par_symbole(int);
-        void completion();
-        void lire_mot();
-        void reconnaitre_mot(std::string);
-    private:
         std::vector<Transition> rechercher_transition(int, char);
+
+        int* compter_transition_partant_d_etat_par_symbole(int);
         bool etat_est_terminal(int);
         bool mot_est_valide(const char*, int, bool);
 };
