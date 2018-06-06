@@ -2,6 +2,20 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <sstream>
+
+Transition creer_transition(std::string str_transition){
+    Transition transition;
+    int depart, arrivee;
+    char symbole;
+    std::istringstream strstream(str_transition);
+    strstream >> depart >> symbole >> arrivee;
+    transition.etatDepart = depart;
+    transition.symbole = symbole;
+    transition.etatArrivee = arrivee;
+
+    return transition;
+}
 
 AF::AF(std::string filename)
 {
@@ -24,13 +38,13 @@ AF::AF(std::string filename)
 
     infile>>nbTransitions;
     for(i = 0;i<nbTransitions;i++){
-        char str_transition[4];
+        std::string str_transition;
         infile >> str_transition;
-        Transition transition;
+        Transition transition = creer_transition(str_transition);
 
-        transition.etatDepart = str_transition[0]-'0';
+        /*transition.etatDepart = str_transition[0]-'0';
         transition.symbole = str_transition[1];
-        transition.etatArrivee = str_transition[2]-'0';
+        transition.etatArrivee = str_transition[2]-'0';*/
 
         transitions.push_back(transition);
     }
@@ -59,7 +73,12 @@ void AF::afficherInfos(){
     if(nbTransitions>0){
         std::cout << "\nListe des transitions : \n";
         for (std::vector<Transition>::const_iterator i = transitions.begin(); i != transitions.end(); ++i){
-            std::cout << "(" << (*i).etatDepart << ")-" << (*i).symbole << "->(" << (char)((*i).etatArrivee == -1 ? 'p':(*i).etatArrivee+'0') << ")\n";
+            std::cout << "(" << (*i).etatDepart << ")-" << (*i).symbole << "->(";
+            if(i->etatArrivee == -1){
+                std::cout << "p)\n";
+            }else{
+                std::cout << (*i).etatArrivee << ")\n";
+            }
         }
     }
 
@@ -215,9 +234,15 @@ bool AF::mot_est_valide(const char* mot, int etatActuel, bool debut){
     }
 
     if(*mot == 0){ //On arrive à la fin du mot
-        if(etat_est_terminal(etatActuel)){ /** TODO: Tester si une transition epsilon mene a un etat terminal **/
+        if(etat_est_terminal(etatActuel)){
             return true; //Le mot est reconnu
         }else{
+            std::vector<Transition> transitions_epsilon = rechercher_transition(etatActuel, '*');
+            for (std::vector<Transition>::iterator i = transitions_epsilon.begin(); i != transitions_epsilon.end(); ++i){
+                if(mot_est_valide(i->symbole == '*' ? mot : (mot+1), i->etatArrivee, false)){
+                    return true;
+                }
+            }
             return false; //Le mot n'est pas reconnu
         }
     }else{
