@@ -188,7 +188,7 @@ void AF::lire_mot(){
 std::vector<Transition> AF::rechercher_transition(int etatDepart, char symbole){
     std::vector<Transition> liste;
     for (std::vector<Transition>::iterator i = transitions.begin(); i != transitions.end(); ++i){
-        if((*i).etatDepart == etatDepart && (*i).symbole == symbole){
+        if((*i).etatDepart == etatDepart && ((*i).symbole == symbole || (*i).symbole == '*')){
             //return &*i;
             liste.push_back(*i);
         }
@@ -215,7 +215,7 @@ bool AF::mot_est_valide(const char* mot, int etatActuel, bool debut){
     }
 
     if(*mot == 0){ //On arrive à la fin du mot
-        if(etat_est_terminal(etatActuel)){
+        if(etat_est_terminal(etatActuel)){ /** TODO: Tester si une transition epsilon mene a un etat terminal **/
             return true; //Le mot est reconnu
         }else{
             return false; //Le mot n'est pas reconnu
@@ -223,7 +223,7 @@ bool AF::mot_est_valide(const char* mot, int etatActuel, bool debut){
     }else{
         std::vector<Transition> transitions_possibles = rechercher_transition(etatActuel, *mot);
         for (std::vector<Transition>::iterator i = transitions_possibles.begin(); i != transitions_possibles.end(); ++i){
-            if(mot_est_valide(mot+1, i->etatArrivee, false)){
+            if(mot_est_valide(i->symbole == '*' ? mot : (mot+1), i->etatArrivee, false)){
                 return true;
             }
         }
