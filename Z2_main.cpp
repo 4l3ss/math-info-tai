@@ -1,8 +1,9 @@
 #include <iostream>
-#include <fstream>
 #include <sstream>
 #include <string>
 #include <sys/stat.h>
+
+#define PREFIX "Z2_"
 
 #include "Z2_AF.h"
 
@@ -22,7 +23,7 @@ string askFilename(){
         cin >> testNumber;
 
         stringstream path;
-        path << "Z2_" << testNumber << ".txt";
+        path << PREFIX << testNumber << ".txt";
         filename = path.str();
     }while(!fexists(filename));
 
@@ -31,13 +32,40 @@ string askFilename(){
 
 int main()
 {
-    string filename = askFilename();
-    cout << "Fichier choisi : " << filename << endl;
-    AF automate(filename);
-    automate.afficherInfos();
-    automate.est_un_automate_asynchrone();
-    automate.est_un_automate_deterministe();
-    automate.est_un_automate_complet();
-    automate.completion();
+    while(true){
+        string filename = askFilename();
+        cout << "Fichier choisi : " << filename << endl;
+        AF automate(filename);
+        automate.afficherInfos();
+        bool testable = false;
+        if(!automate.est_un_automate_asynchrone() && automate.est_un_automate_deterministe()){
+            testable = true;
+            if(!automate.est_un_automate_complet()){
+                automate.completion();
+            }
+        }
+        automate.afficherInfos();
+        char choice;
+        do{
+            cout << "\n 1) Changer d'automate\n";
+            if(testable){
+                cout << " 2) Tester des mots sur cet automate\n";
+            }
+            cout << "choix > ";
+            cin >> choice;
+
+            switch(choice){
+                case '2':
+                    if(testable){
+                        automate.lire_mot();
+                    }
+                break;
+            }
+
+        }
+        while(choice != '1');
+
+    }
+
     return 0;
 }

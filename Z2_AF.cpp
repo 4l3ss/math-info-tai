@@ -1,6 +1,7 @@
 #include "Z2_AF.h"
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 
 AF::AF(std::string filename)
 {
@@ -55,9 +56,11 @@ void AF::afficherInfos(){
         std::cout << *i << " ";
     }
 
-    std::cout << "\nListe des transitions : \n";
-    for (std::vector<Transition>::const_iterator i = transitions.begin(); i != transitions.end(); ++i){
-        std::cout << "(" << (*i).etatDepart << ")-" << (*i).symbole << "->(" << (*i).etatArrivee << ")\n";
+    if(nbTransitions>0){
+        std::cout << "\nListe des transitions : \n";
+        for (std::vector<Transition>::const_iterator i = transitions.begin(); i != transitions.end(); ++i){
+            std::cout << "(" << (*i).etatDepart << ")-" << (*i).symbole << "->(" << (char)((*i).etatArrivee == -1 ? 'p':(*i).etatArrivee+'0') << ")\n";
+        }
     }
 
 
@@ -139,21 +142,91 @@ bool AF::est_un_automate_complet(){
 
 void AF::completion(){
     int i,j;
+    bool ajouter_poubelle = true;
     for(i=0; i<nbEtats;i++){
         int *comptes = compter_transition_partant_d_etat_par_symbole(i);
         for(j=0; j<nbSymboles;j++){
             if(comptes[j] == 0){
-                std::cout << " * L'etat " << i << " n'a pas de transition sortante \"" << (char)(j+'a') << "\"\n";
                 std::cout << "   -> Ajout d'une transition vers l'etat poubelle " << i << (char)(j+'a') << "p\n";
 
                 Transition transition;
                 transition.etatDepart = i;
                 transition.symbole = j+'a';
                 transition.etatArrivee = -1;
+
                 transitions.push_back(transition);
+
+                nbTransitions++;
+                if(ajouter_poubelle){
+                    nbEtats++;
+                    ajouter_poubelle = false;
+                }
             }
         }
     }
 
     est_un_automate_complet();
+}
+
+void AF::lire_mot(){
+    std::cin.ignore();
+    if(nbEtatsInitiaux > 1){
+        std::cout << "Non deterministe non supporte\n"; return;
+    }
+
+    std::cout << "Ecrivez des mots, entrez \"fin\" pour revenir au menu\n";
+    while(1){
+        std::cin.clear();
+        std::string mot = "";
+        getline(std::cin, mot);
+        if(mot == "fin"){
+            break;
+        }
+
+        reconnaitre_mot(mot);
+    }
+    std::cin.clear();
+
+}
+
+Transition* AF::rechercher_transition(int etatDepart, char symbole){
+    for (std::vector<Transition>::iterator i = transitions.begin(); i != transitions.end(); ++i){
+        if((*i).etatDepart == etatDepart && (*i).symbole == symbole){
+            return &*i;
+        }
+    }
+
+    return 0;
+}
+
+void AF::reconnaitre_mot(std::string mot){
+
+    int etat = etatsInitiaux.front();
+    int position_mot = 0;
+    std::cout << etat;
+    std::cout << "\n->("<<etat<<")-";
+    while(mot[position_mot] != 0){
+        if(mot[position_mot]<'a' || mot[position_mot]>'a'+nbSymboles){
+            std::cout<< "Le symbole " << mot[position_mot] << " ne fait pas parti de l'alphabet\n";
+            return;
+        }
+        Transition* chemin = rechercher_transition(etat, mot[position_mot]);
+        if(chemin != 0){
+            etat = chemin->etatArrivee;
+        }else{
+            break;
+        }
+        std::cout << mot[position_mot] << "->("<<(char)(etat == -1 ? 'p':(etat+'0'))<<")-";
+        position_mot++;
+    }
+
+    if(mot[position_mot] != 0){
+        std::cout << "\nLe mot n'est pas reconnu : Le mot n'est pas fini mais aucune transition n'accepte le symbole suivant\n";
+    }else if(std::find(etatsTerminaux.begin(), etatsTerminaux.end(), etat) == etatsTerminaux.end()){
+        std::cout << " \nLe mot n'est pas reconnu : l'etat " << (char)(etat == -1 ? 'p':(etat+'0')) << " n'est pas terminal\n";
+    }else{
+        //on est a un etat terminal
+        std::cout << "\nLe mot est reconnu\n";
+    }
+
 }

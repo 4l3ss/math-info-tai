@@ -33,6 +33,9 @@ class AF
         void afficherInfos();
         int* compter_transition_partant_d_etat_par_symbole(int);
         void completion();
+        void lire_mot();
+        Transition* rechercher_transition(int, char);
+        void reconnaitre_mot(std::string);
 };
 
 #endif // AF_H
