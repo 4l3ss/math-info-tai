@@ -63,7 +63,7 @@ int main()
             cin >> choice;
 
             switch(choice){
-                case '2': automate.lire_mot();
+                case '2': automate.lire_mot(); break;
                 case '3':
                     if(est_complet){
                         automate = automate.automate_complementaire();

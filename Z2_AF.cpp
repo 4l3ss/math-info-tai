@@ -84,12 +84,11 @@ void AF::afficherInfos(){
 }
 
 bool AF::est_un_automate_asynchrone(){
-    std::cout << "\n Test asynchrone : \n";
     bool resultat = false;
     for (std::vector<Transition>::const_iterator i = transitions.begin(); i != transitions.end(); ++i){
         if((*i).symbole == '*'){
             resultat = true;
-            std::cout << "(" << (*i).etatDepart << ")-" << (*i).symbole << "->(" << (*i).etatArrivee << ") est une transition epsilon\n";
+            std::cout << " * (" << (*i).etatDepart << ")-" << (*i).symbole << "->(" << (*i).etatArrivee << ") est une transition epsilon\n";
         }
 
     }
@@ -274,8 +273,6 @@ bool AF::possede_etat_poubelle(){
 AF AF::automate_complementaire(){
     AF automate;
     for(int i = -1; i<nbEtats;i++){
-
-
         if(etat_est_terminal(i) == false){
             if(i==-1 && possede_etat_poubelle()){ //etat poubelle
                 automate.etatsTerminaux.push_back(i);
