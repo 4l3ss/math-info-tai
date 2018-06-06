@@ -38,10 +38,12 @@ int main()
         AF automate(filename);
         automate.afficherInfos();
         bool testable = false;
-        if(!automate.est_un_automate_asynchrone() && automate.est_un_automate_deterministe()){
+        if(!automate.est_un_automate_asynchrone()){
             testable = true;
-            if(!automate.est_un_automate_complet()){
-                automate.completion();
+            if(automate.est_un_automate_deterministe()){
+                if(!automate.est_un_automate_complet()){
+                    automate.completion();
+                }
             }
         }
         automate.afficherInfos();

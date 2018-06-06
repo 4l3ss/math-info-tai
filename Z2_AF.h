@@ -34,8 +34,11 @@ class AF
         int* compter_transition_partant_d_etat_par_symbole(int);
         void completion();
         void lire_mot();
-        Transition* rechercher_transition(int, char);
         void reconnaitre_mot(std::string);
+    private:
+        std::vector<Transition> rechercher_transition(int, char);
+        bool etat_est_terminal(int);
+        bool mot_est_valide(const char*, int, bool);
 };
 
 #endif // AF_H

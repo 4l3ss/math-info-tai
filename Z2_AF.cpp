@@ -170,10 +170,6 @@ void AF::completion(){
 
 void AF::lire_mot(){
     std::cin.ignore();
-    if(nbEtatsInitiaux > 1){
-        std::cout << "Non deterministe non supporte\n"; return;
-    }
-
     std::cout << "Ecrivez des mots, entrez \"fin\" pour revenir au menu\n";
     while(1){
         std::cin.clear();
@@ -189,19 +185,58 @@ void AF::lire_mot(){
 
 }
 
-Transition* AF::rechercher_transition(int etatDepart, char symbole){
+std::vector<Transition> AF::rechercher_transition(int etatDepart, char symbole){
+    std::vector<Transition> liste;
     for (std::vector<Transition>::iterator i = transitions.begin(); i != transitions.end(); ++i){
         if((*i).etatDepart == etatDepart && (*i).symbole == symbole){
-            return &*i;
+            //return &*i;
+            liste.push_back(*i);
         }
     }
 
-    return 0;
+    return liste;
 }
 
-void AF::reconnaitre_mot(std::string mot){
+bool AF::etat_est_terminal(int etat){
+    return std::find(etatsTerminaux.begin(), etatsTerminaux.end(), etat) != etatsTerminaux.end();
+}
 
-    int etat = etatsInitiaux.front();
+bool AF::mot_est_valide(const char* mot, int etatActuel, bool debut){
+    if(debut == true){
+        //for each etat de depart
+        for (std::vector<int>::iterator etatDepart = etatsInitiaux.begin(); etatDepart != etatsInitiaux.end(); ++etatDepart){
+            if(this->mot_est_valide(mot, *etatDepart, false)){
+                return true; //L'etat de depart choisi amene à une reonnaissance
+            }
+        }
+
+        return false; //Aucune etat de départ ne conduit à une reconnaissance du mot
+
+    }
+
+    if(*mot == 0){ //On arrive à la fin du mot
+        if(etat_est_terminal(etatActuel)){
+            return true; //Le mot est reconnu
+        }else{
+            return false; //Le mot n'est pas reconnu
+        }
+    }else{
+        std::vector<Transition> transitions_possibles = rechercher_transition(etatActuel, *mot);
+        for (std::vector<Transition>::iterator i = transitions_possibles.begin(); i != transitions_possibles.end(); ++i){
+            if(mot_est_valide(mot+1, i->etatArrivee, false)){
+                return true;
+            }
+        }
+        return false; //Aucune transition depuis l'etat actuel ne conduit à une reconnaissance du mot
+    }
+}
+void AF::reconnaitre_mot(std::string mot){
+    if(this->mot_est_valide(mot.c_str(), 0, true)){
+        std::cout << "Le mot est reconnu\n";
+    }else{
+        std::cout << "Le mot n'est pas reconnu\n";
+    }
+   /* int etat = etatsInitiaux.front();
     int position_mot = 0;
     std::cout << etat;
     std::cout << "\n->("<<etat<<")-";
@@ -227,6 +262,6 @@ void AF::reconnaitre_mot(std::string mot){
     }else{
         //on est a un etat terminal
         std::cout << "\nLe mot est reconnu\n";
-    }
+    }*/
 
 }
